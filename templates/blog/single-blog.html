@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ article.titre }} | pillloMart{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb start -->
+<section class="breadcrumb_part">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb_iner">
+          <h2>{{ article.titre }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Breadcrumb end -->
+
+<section class="blog_area single-post-area section_padding">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 posts-list">
+        <div class="single-post">
+          <div class="feature-img">
+            {% if article.image %}
+              <img class="img-fluid" src="{{ article.image.url }}" alt="{{ article.titre }}">
+            {% else %}
+              <img class="img-fluid" src="{% static 'img/blog/default.jpg' %}" alt="Image défaut">
+            {% endif %}
+          </div>
+          <div class="blog_details">
+            <h2>{{ article.titre }}</h2>
+            <ul class="blog-info-link mt-3 mb-4">
+              <li><i class="far fa-user"></i> {{ article.auteur.username }}</li>
+              <li><i class="far fa-comments"></i> {{ article.commentaires.count }} Commentaire(s)</li>
+            </ul>
+            <p class="excert">{{ article.contenu|linebreaks }}</p>
+          </div>
+        </div>
+
+        <div class="navigation-area">
+          <div class="row">
+            {% if previous_article %}
+            <div class="col-lg-6 nav-left d-flex align-items-center">
+              <div class="thumb">
+                <a href="{% url 'single_blog' previous_article.pk %}">
+                  {% if previous_article.image %}
+                    <img class="img-fluid" src="{{ previous_article.image.url }}" alt="">
+                  {% endif %}
+                </a>
+              </div>
+              <div class="details">
+                <p>Article précédent</p>
+                <a href="{% url 'single_blog' previous_article.pk %}">
+                  <h4>{{ previous_article.titre }}</h4>
+                </a>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if next_article %}
+            <div class="col-lg-6 nav-right d-flex align-items-center justify-content-end">
+              <div class="details">
+                <p>Article suivant</p>
+                <a href="{% url 'single_blog' next_article.pk %}">
+                  <h4>{{ next_article.titre }}</h4>
+                </a>
+              </div>
+              <div class="thumb">
+                <a href="{% url 'single_blog' next_article.pk %}">
+                  {% if next_article.image %}
+                    <img class="img-fluid" src="{{ next_article.image.url }}" alt="">
+                  {% endif %}
+                </a>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="blog-author">
+          <div class="media align-items-center">
+            <img src="{% static 'img/blog/author.png' %}" alt="">
+            <div class="media-body">
+              <h4>{{ article.auteur.username }}</h4>
+              <p>Biographie ou description rapide ici si disponible...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comment Section -->
+        <div class="comments-area">
+          <h4>{{ article.commentaires.count }} Commentaire(s)</h4>
+          {% for commentaire in article.commentaires.all %}
+          <div class="comment-list">
+            <div class="single-comment d-flex">
+              <div class="thumb">
+                <img src="{% static 'img/comment/default.png' %}" alt="">
+              </div>
+              <div class="desc">
+                <p class="comment">{{ commentaire.contenu }}</p>
+                <div class="d-flex justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <h5><a href="#">{{ commentaire.utilisateur.username }}</a></h5>
+                    <p class="date">{{ commentaire.date|date:"d M Y à H:i" }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="comment-form">
+          <h4>Laisser un commentaire</h4>
+          <form method="post" class="form-contact comment_form">
+            {% csrf_token %}
+            <div class="form-group">
+              <textarea class="form-control w-100" name="contenu" cols="30" rows="9" placeholder="Votre commentaire..."></textarea>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="button-contactForm btn_3">Envoyer</button>
+            </div>
+          </form>
+        </div>
+        {% else %}
+        <p>Vous devez être <a href="{% url 'login' %}">connecté</a> pour commenter.</p>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-4">
+        <div class="blog_right_sidebar">
+          <!-- Recent Posts -->
+          <aside class="single_sidebar_widget popular_post_widget">
+            <h3 class="widget_title">Articles récents</h3>
+            {% for recent in recent_posts %}
+            <div class="media post_item">
+              {% if recent.image %}
+              <img src="{{ recent.image.url }}" alt="{{ recent.titre }}">
+              {% endif %}
+              <div class="media-body">
+                <a href="{% url 'single_blog' recent.pk %}">
+                  <h3>{{ recent.titre }}</h3>
+                </a>
+                <p>{{ recent.date_publication|date:"d M Y" }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </aside>
+
+          <!-- Tag Cloud -->
+          <aside class="single_sidebar_widget tag_cloud_widget">
+            <h4 class="widget_title">Tags</h4>
+            <ul class="list">
+              {% for tag in article.tags.all %}
+              {% if tag.nom %}
+              <li><a href="{% url 'blog_by_tag' tag.nom %}">{{ tag.nom }}</a></li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

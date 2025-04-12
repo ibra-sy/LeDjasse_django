@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}LeDjassa - Blog{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb part start-->
+<section class="breadcrumb_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner">
+                    <h2>Blog</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb part end-->
+
+<!-- Blog Area start -->
+<section class="blog_area section_padding">
+    <div class="container">
+        <div class="row">
+            <!-- Zone des articles principaux -->
+            <div class="col-lg-8 mb-5 mb-lg-0">
+                <div class="blog_left_sidebar">
+                    {% if articles %}
+                        {% for article in articles %}
+                            <article class="blog_item">
+                                <div class="blog_item_img">
+                                    {% if article.image %}
+                                        <img class="card-img rounded-0" src="{{ article.image.url }}" alt="{{ article.titre }}">
+                                    {% else %}
+                                        <img class="card-img rounded-0" src="{% static 'img/placeholder_blog.png' %}" alt="Pas d'image">
+                                    {% endif %}
+                                    <a href="{% url 'single_blog' article.id %}" class="blog_item_date">
+                                        <h3>{{ article.date_publication|date:"d" }}</h3>
+                                        <p>{{ article.date_publication|date:"M" }}</p>
+                                    </a>
+                                </div>
+                                <div class="blog_details">
+                                    <a class="d-inline-block" href="{% url 'single_blog' article.id %}">
+                                        <h2>{{ article.titre }}</h2>
+                                    </a>
+                                    <p>{{ article.extrait }}</p>
+                                    <ul class="blog-info-link">
+                                        <li>
+                                            <a href="#"><i class="far fa-user"></i> {{ article.auteur.username }}</a>
+                                        </li>
+                                        <li>
+                                            <a href="#"><i class="far fa-comments"></i> {{ article.commentaires.count }} Comments</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                        <p>Aucun article publié pour le moment.</p>
+                    {% endif %}
+
+                    <!-- Pagination (optionnelle) -->
+                    <nav class="blog-pagination justify-content-center d-flex">
+                        <ul class="pagination">
+                            {# Vous ajouterez ici la pagination dynamique si nécessaire #}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Barre latérale (Sidebar) -->
+            <div class="col-lg-4">
+                <div class="blog_right_sidebar">
+                    <!-- Widget Recherche -->
+                    <aside class="single_sidebar_widget search_widget">
+                        <form action="#">
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" placeholder='Search Keyword'
+                                        onfocus="this.placeholder = ''" onblur="this.placeholder = 'Search Keyword'">
+                                    <div class="input-group-append">
+                                        <button class="btn" type="button"><i class="ti-search"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="button rounded-0 primary-bg text-white w-100 btn_1" type="submit">Search</button>
+                        </form>
+                    </aside>
+
+                    <!-- Widget Catégories -->
+                    <aside class="single_sidebar_widget post_category_widget">
+                        <h4 class="widget_title">Catégories</h4>
+                        <ul class="list cat-list">
+                            {% for categorie in blog_categories %}
+                                <li>
+                                    <a href="{% url 'blog' %}?categorie={{ categorie.id }}" class="d-flex">
+                                        <p>{{ categorie.nom }}</p>
+                                        <p>({{ categorie.article_set.count }})</p>
+                                    </a>
+                                </li>
+                            {% empty %}
+                                <li>Aucune catégorie</li>
+                            {% endfor %}
+                        </ul>
+                    </aside>
+
+                    {# Vous pouvez ajouter ici d'autres widgets selon vos besoins #}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Area end -->
+
+{% endblock %}
