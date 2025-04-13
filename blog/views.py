@@ -1,6 +1,9 @@
 from django.shortcuts import redirect, render, get_object_or_404
+
+from ecommerce.models import ProfilUtilisateur
 from .models import Article, Commentaire, Categorie, Tag
-from .forms import CommentaireForm
+from .forms import ArticleForm, CommentaireForm
+from django.contrib.auth.decorators import login_required
 
 def blog_list(request):
     categorie_id = request.GET.get('categorie')
@@ -17,27 +20,21 @@ def blog_list(request):
 
 def single_blog(request, pk):
     article = get_object_or_404(Article, pk=pk)
-    commentaires = article.commentaires.all()
+    previous_article = Article.objects.filter(id__lt=article.id).order_by('-id').first()
+    next_article = Article.objects.filter(id__gt=article.id).order_by('id').first()
+    recent_posts = Article.objects.exclude(id=pk).order_by('-date_publication')[:3]
 
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            form = CommentaireForm(request.POST)
-            if form.is_valid():
-                commentaire = form.save(commit=False)
-                commentaire.utilisateur = request.user
-                commentaire.article = article
-                commentaire.save()
-                return redirect('single_blog', pk=article.pk)
-        else:
-            return redirect('login')
-    else:
-        form = CommentaireForm()
-    recent_posts = Article.objects.filter(statut='publie').exclude(pk=article.pk).order_by('-date_publication')[:4]
+    if request.method == 'POST' and request.user.is_authenticated:
+        contenu = request.POST.get('contenu')
+        if contenu:
+            Commentaire.objects.create(article=article, utilisateur=request.user, contenu=contenu)
+            return redirect('single_blog', pk=pk)
+
     return render(request, 'blog/single-blog.html', {
         'article': article,
+        'previous_article': previous_article,
+        'next_article': next_article,
         'recent_posts': recent_posts,
-        'commentaires': commentaires,
-        'form': form
     })
 
 
@@ -47,3 +44,24 @@ def blog_by_tag(request, slug):
     return render(request, 'blog/blog.html', {'articles': articles, 'selected_tag': tag})
 
 
+@login_required
+def ajouter_article_blog(request):
+    try:
+        profil = request.user.profilutilisateur
+        if profil.role != 'vendeur':
+            return redirect('blog')  # redirige les non-vendeurs
+
+        if request.method == 'POST':
+            form = ArticleForm(request.POST, request.FILES)
+            if form.is_valid():
+                article = form.save(commit=False)
+                article.auteur = request.user
+                article.save()
+                form.save_m2m()
+                return redirect('blog')
+        else:
+            form = ArticleForm()
+        return render(request, 'blog/ajouter_article.html', {'form': form})
+
+    except ProfilUtilisateur.DoesNotExist:
+        return redirect('blog')

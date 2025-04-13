@@ -20,6 +20,7 @@
 <section class="blog_area single-post-area section_padding">
   <div class="container">
     <div class="row">
+      <!-- CONTENU PRINCIPAL -->
       <div class="col-lg-8 posts-list">
         <div class="single-post">
           <div class="feature-img">
@@ -35,10 +36,13 @@
               <li><i class="far fa-user"></i> {{ article.auteur.username }}</li>
               <li><i class="far fa-comments"></i> {{ article.commentaires.count }} Commentaire(s)</li>
             </ul>
-            <p class="excert">{{ article.contenu|linebreaks }}</p>
+            <div class="excert">
+              {{ article.contenu|safe }}
+            </div>
           </div>
         </div>
 
+        <!-- NAVIGATION ENTRE ARTICLES -->
         <div class="navigation-area">
           <div class="row">
             {% if previous_article %}
@@ -79,6 +83,7 @@
           </div>
         </div>
 
+        <!-- AUTEUR -->
         <div class="blog-author">
           <div class="media align-items-center">
             <img src="{% static 'img/blog/author.png' %}" alt="">
@@ -89,7 +94,7 @@
           </div>
         </div>
 
-        <!-- Comment Section -->
+        <!-- COMMENTAIRES -->
         <div class="comments-area">
           <h4>{{ article.commentaires.count }} Commentaire(s)</h4>
           {% for commentaire in article.commentaires.all %}
@@ -112,6 +117,7 @@
           {% endfor %}
         </div>
 
+        <!-- FORMULAIRE DE COMMENTAIRE -->
         {% if user.is_authenticated %}
         <div class="comment-form">
           <h4>Laisser un commentaire</h4>
@@ -130,19 +136,20 @@
         {% endif %}
       </div>
 
+      <!-- SIDEBAR À DROITE -->
       <div class="col-lg-4">
         <div class="blog_right_sidebar">
-          <!-- Recent Posts -->
+          <!-- ARTICLES RÉCENTS -->
           <aside class="single_sidebar_widget popular_post_widget">
             <h3 class="widget_title">Articles récents</h3>
             {% for recent in recent_posts %}
             <div class="media post_item">
               {% if recent.image %}
-              <img src="{{ recent.image.url }}" alt="{{ recent.titre }}">
+                <img src="{{ recent.image.url }}" alt="{{ recent.titre }}" style="width:60px; height:60px; object-fit:cover;">
               {% endif %}
               <div class="media-body">
                 <a href="{% url 'single_blog' recent.pk %}">
-                  <h3>{{ recent.titre }}</h3>
+                  <h3 style="font-size: 16px;">{{ recent.titre }}</h3>
                 </a>
                 <p>{{ recent.date_publication|date:"d M Y" }}</p>
               </div>
@@ -150,13 +157,13 @@
             {% endfor %}
           </aside>
 
-          <!-- Tag Cloud -->
+          <!-- TAG CLOUD -->
           <aside class="single_sidebar_widget tag_cloud_widget">
             <h4 class="widget_title">Tags</h4>
             <ul class="list">
               {% for tag in article.tags.all %}
               {% if tag.nom %}
-              <li><a href="{% url 'blog_by_tag' tag.nom %}">{{ tag.nom }}</a></li>
+                <li><a href="{% url 'blog_by_tag' tag.nom %}">{{ tag.nom }}</a></li>
               {% endif %}
               {% endfor %}
             </ul>

@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from tinymce.models import HTMLField
+
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=100, verbose_name="Nom de la catégorie")
@@ -27,7 +29,7 @@ class Article(models.Model):
         ('publie', 'Publié'),
     ]
     titre = models.CharField(max_length=200, verbose_name="Titre")
-    contenu = models.TextField(verbose_name="Contenu")
+    contenu = HTMLField(verbose_name="Contenu")
     image = models.ImageField(upload_to='blog/', null=True, blank=True, verbose_name="Image de l'article")
     date_publication = models.DateTimeField(auto_now_add=True, verbose_name="Date de publication")
     statut = models.CharField(max_length=10, choices=CHOIX_STATUT, default='brouillon', verbose_name="Statut")

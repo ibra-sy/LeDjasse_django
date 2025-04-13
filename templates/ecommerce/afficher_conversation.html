@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Conversation{% endblock %}
+
+{% block content %}
+<section class="breadcrumb_part">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb_iner">
+          <h2>Conversation</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section_padding">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 bg-white p-4 rounded shadow-sm">
+        <div class="mb-4">
+          <a href="{% url 'messagerie_accueil' %}" class="btn btn-sm btn-outline-secondary">← Retour</a>
+        </div>
+        <div style="max-height: 400px; overflow-y: auto;">
+          {% for msg in messages %}
+            <div class="mb-3 {% if msg.expediteur == user %}text-right{% endif %}">
+              <p class="mb-1"><strong>{{ msg.expediteur.username }}</strong></p>
+              <div class="p-2 rounded {% if msg.expediteur == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                {{ msg.contenu }}
+              </div>
+              <small class="text-muted">{{ msg.date_envoi|date:"d M Y à H:i" }}</small>
+            </div>
+          {% endfor %}
+        </div>
+
+        <form method="post" class="mt-4">
+          {% csrf_token %}
+          <div class="form-group">
+            <textarea name="contenu" rows="3" class="form-control" placeholder="Votre message..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn_3">Envoyer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

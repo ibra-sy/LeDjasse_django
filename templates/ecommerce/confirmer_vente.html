@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Confirmation de vente{% endblock %}
+{% block content %}
+
+<section class="section_padding">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 bg-white p-4 rounded shadow-sm">
+        <h3 class="text-center mb-4">Confirmer la vente</h3>
+        <p><strong>Produit :</strong> {{ produit.titre }}</p>
+        <p><strong>Prix :</strong> {{ produit.prix }} FCFA</p>
+        <hr>
+        <h5>Adresse de livraison du client :</h5>
+        <ul>
+          <li><strong>Email :</strong> {{ email_client }}</li>
+          <li><strong>Ville :</strong> {{ ville }}</li>
+          <li><strong>Commune :</strong> {{ commune }}</li>
+          <li><strong>Quartier :</strong> {{ quartier }}</li>
+          <li><strong>Rue :</strong> {{ rue }}</li>
+        </ul>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="text-center mt-4">
+            <button type="submit" class="btn_3">Confirmer la vente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

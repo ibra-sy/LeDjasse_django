@@ -21,6 +21,13 @@ body {
   font-size: 14px;
 }
 
+select.form-control {
+  max-width: 100%;
+  overflow: hidden;
+  appearance: auto;
+}
+
+
 /* line 10, /Applications/MAMP/htdocs/old/palash/cl/shop_html/sass/_common.scss */
 .message_submit_form:focus {
   outline: none;

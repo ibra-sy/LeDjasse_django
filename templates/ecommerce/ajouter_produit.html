@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ajouter un produit | LeDjassa{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<section class="breadcrumb_part">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb_iner">
+          <h2>Publier un nouvel article</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Formulaire -->
+<section class="section_padding">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 bg-white p-5 rounded shadow-sm">
+
+        <h3 class="mb-5 text-center">Détails de l’article</h3>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="id_titre">Titre :</label>
+                    {{ form.titre }}
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="id_prix">Prix (CFA) :</label>
+                    {{ form.prix }}
+                </div>
+        
+                <div class="col-md-6 mb-4">
+                    <label for="id_etat">État :</label>
+                    <input list="etat-options" name="etat" id="id_etat" class="form-control"
+                           value="{{ form.data.etat|default_if_none:'' }}">
+                    <datalist id="etat-options">
+                      {% for val, label in form.fields.etat.choices %}
+                        {% if val %}  {# Ignore l'option vide si elle existe #}
+                          <option value="{{ val }}">{{ label }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </datalist>
+                  </div>
+                
+                  <div class="col-md-6 mb-4">
+                    <label for="id_categorie">Catégorie :</label>
+                    <input list="categorie-options" name="categorie" id="id_categorie" class="form-control"
+                    value="{{ form.data.categorie|default_if_none:'' }}">
+                    <datalist id="categorie-options">
+                      {% for categorie in form.fields.categorie.queryset %}
+                        <option value="{{ categorie.pk }}">{{ categorie.nom }}</option>
+                      {% endfor %}
+                    </datalist>
+                  </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="id_image">Image du produit :</label>
+                    {{ form.image }}
+                </div>
+
+                <div class="col-md-12 mb-5">
+                    <label for="id_description">Description complète :</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="col-md-12 text-center mt-4">
+                    <button type="submit" class="btn_3">PUBLIER L’ARTICLE</button>
+                </div>
+            </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

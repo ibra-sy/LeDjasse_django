@@ -25,6 +25,7 @@ urlpatterns = [
     path('ecommerce/', include('ecommerce.urls')),
     path('blog/', include('blog.urls')),
     path('api/', include('api.urls')),
+    path('tinymce/', include('tinymce.urls')),  # URL pour TinyMCE
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

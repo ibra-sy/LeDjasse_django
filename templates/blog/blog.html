@@ -19,6 +19,11 @@
 <!-- Breadcrumb part end-->
 
 <!-- Blog Area start -->
+{% if user.is_authenticated and user.profilutilisateur.role == 'vendeur' %}
+<div class="mb-4 text-left">
+    <a href="{% url 'ajouter_article_blog' %}" class="btn_3">Publier un article</a>
+</div>
+{% endif %}
 <section class="blog_area section_padding">
     <div class="container">
         <div class="row">
@@ -28,11 +33,17 @@
                     {% if articles %}
                         {% for article in articles %}
                             <article class="blog_item">
-                                <div class="blog_item_img">
+                                <div class="blog_item_img text-center">
                                     {% if article.image %}
-                                        <img class="card-img rounded-0" src="{{ article.image.url }}" alt="{{ article.titre }}">
+                                        <img class="card-img rounded-0"
+                                             src="{{ article.image.url }}"
+                                             alt="{{ article.titre }}"
+                                             style="width:100%; max-width:100%; height: 500px; object-fit:cover; display:block; margin:auto;">
                                     {% else %}
-                                        <img class="card-img rounded-0" src="{% static 'img/placeholder_blog.png' %}" alt="Pas d'image">
+                                        <img class="card-img rounded-0"
+                                             src="{% static 'img/placeholder_blog.png' %}"
+                                             alt="Pas d'image"
+                                             style="width:100%; max-width:100%; height:250px; object-fit:cover; display:block; margin:auto;">
                                     {% endif %}
                                     <a href="{% url 'single_blog' article.id %}" class="blog_item_date">
                                         <h3>{{ article.date_publication|date:"d" }}</h3>
