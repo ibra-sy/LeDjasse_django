@@ -36,6 +36,12 @@
               <li><i class="far fa-user"></i> {{ article.auteur.username }}</li>
               <li><i class="far fa-comments"></i> {{ article.commentaires.count }} Commentaire(s)</li>
             </ul>
+            {% if user == article.auteur %}
+            <div class="text-right mb-3">
+               <a href="{% url 'modifier_article' article.id %}" class="btn btn-outline-warning btn-sm">Modifier</a>
+               <a href="{% url 'supprimer_article' article.id %}" class="btn btn-outline-danger btn-sm">Supprimer</a>
+            </div>
+            {% endif %}
             <div class="excert">
               {{ article.contenu|safe }}
             </div>

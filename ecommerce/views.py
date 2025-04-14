@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.core.paginator import Paginator
 
 
 from django.contrib.auth import get_user_model
@@ -15,13 +16,23 @@ User = get_user_model()
 
 def product_list(request):
     categorie_id = request.GET.get('categorie')
+    categories = Categorie.objects.all()
+
     if categorie_id:
         produits = Produit.objects.filter(en_ligne=True, statut='disponible', categorie__id=categorie_id)
+        paginated = False  # Pas de pagination pour un filtre par catégorie
     else:
         produits = Produit.objects.filter(en_ligne=True, statut='disponible')
-    
-    categories = Categorie.objects.all()
-    return render(request, 'ecommerce/product_list.html', {'produits': produits, 'categories': categories})
+        paginator = Paginator(produits, 6)  # 6 produits par page
+        page_number = request.GET.get('page')
+        produits = paginator.get_page(page_number)
+        paginated = True  # Afficher les numéros de pages
+
+    return render(request, 'ecommerce/product_list.html', {
+        'produits': produits,
+        'categories': categories,
+        'paginated': paginated
+    })
 
 def single_product(request, product_id):
     # Récupère le produit dont l'id est passé en paramètre

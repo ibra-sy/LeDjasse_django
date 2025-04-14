@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block title %}LeDjassa - Blog{% endblock %}
 
 {% block content %}
-<!-- Breadcrumb part start-->
+<!-- Breadcrumb -->
 <section class="breadcrumb_part">
     <div class="container">
         <div class="row">
@@ -16,111 +15,117 @@
         </div>
     </div>
 </section>
-<!-- Breadcrumb part end-->
 
-<!-- Blog Area start -->
+<!-- Si vendeur connecté -->
 {% if user.is_authenticated and user.profilutilisateur.role == 'vendeur' %}
 <div class="mb-4 text-left">
     <a href="{% url 'ajouter_article_blog' %}" class="btn_3">Publier un article</a>
 </div>
 {% endif %}
+
+<!-- Blog Section -->
 <section class="blog_area section_padding">
     <div class="container">
         <div class="row">
-            <!-- Zone des articles principaux -->
+            <!-- Zone articles -->
             <div class="col-lg-8 mb-5 mb-lg-0">
                 <div class="blog_left_sidebar">
                     {% if articles %}
                         {% for article in articles %}
-                            <article class="blog_item">
-                                <div class="blog_item_img text-center">
-                                    {% if article.image %}
-                                        <img class="card-img rounded-0"
-                                             src="{{ article.image.url }}"
-                                             alt="{{ article.titre }}"
-                                             style="width:100%; max-width:100%; height: 500px; object-fit:cover; display:block; margin:auto;">
-                                    {% else %}
-                                        <img class="card-img rounded-0"
-                                             src="{% static 'img/placeholder_blog.png' %}"
-                                             alt="Pas d'image"
-                                             style="width:100%; max-width:100%; height:250px; object-fit:cover; display:block; margin:auto;">
-                                    {% endif %}
-                                    <a href="{% url 'single_blog' article.id %}" class="blog_item_date">
-                                        <h3>{{ article.date_publication|date:"d" }}</h3>
-                                        <p>{{ article.date_publication|date:"M" }}</p>
-                                    </a>
-                                </div>
-                                <div class="blog_details">
-                                    <a class="d-inline-block" href="{% url 'single_blog' article.id %}">
-                                        <h2>{{ article.titre }}</h2>
-                                    </a>
-                                    <p>{{ article.extrait }}</p>
-                                    <ul class="blog-info-link">
-                                        <li>
-                                            <a href="#"><i class="far fa-user"></i> {{ article.auteur.username }}</a>
-                                        </li>
-                                        <li>
-                                            <a href="#"><i class="far fa-comments"></i> {{ article.commentaires.count }} Comments</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </article>
+                        <article class="blog_item">
+                            <div class="blog_item_img text-center">
+                                {% if article.image %}
+                                    <img class="card-img rounded-0" src="{{ article.image.url }}" alt="{{ article.titre }}"
+                                         style="width:100%; max-width:100%; height: 400px; object-fit:cover;">
+                                {% else %}
+                                    <img class="card-img rounded-0" src="{% static 'img/placeholder_blog.png' %}" alt="Image défaut"
+                                         style="width:100%; max-width:100%; height: 300px; object-fit:cover;">
+                                {% endif %}
+                                <a href="{% url 'single_blog' article.id %}" class="blog_item_date">
+                                    <h3>{{ article.date_publication|date:"d" }}</h3>
+                                    <p>{{ article.date_publication|date:"M" }}</p>
+                                </a>
+                            </div>
+                            <div class="blog_details">
+                                <a class="d-inline-block" href="{% url 'single_blog' article.id %}">
+                                    <h2>{{ article.titre }}</h2>
+                                </a>
+                                <p>{{ article.contenu|truncatewords:30 }}</p>
+                                <ul class="blog-info-link">
+                                    <li><i class="far fa-user"></i> {{ article.auteur.username }}</li>
+                                    <li><i class="far fa-comments"></i> {{ article.commentaires.count }} Commentaire(s)</li>
+                                </ul>
+                            </div>
+                        </article>
                         {% endfor %}
                     {% else %}
-                        <p>Aucun article publié pour le moment.</p>
+                        <p>Aucun article trouvé.</p>
                     {% endif %}
 
-                    <!-- Pagination (optionnelle) -->
-                    <nav class="blog-pagination justify-content-center d-flex">
+                    {% if paginated %}
+                    <!-- Pagination -->
+                    <nav class="blog-pagination justify-content-center d-flex mt-4">
                         <ul class="pagination">
-                            {# Vous ajouterez ici la pagination dynamique si nécessaire #}
+                            {% if articles.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ articles.previous_page_number }}">«</a>
+                                </li>
+                            {% endif %}
+                            {% for num in articles.paginator.page_range %}
+                                <li class="page-item {% if articles.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+                            {% if articles.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ articles.next_page_number }}">»</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </nav>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Barre latérale (Sidebar) -->
+            <!-- Sidebar -->
             <div class="col-lg-4">
                 <div class="blog_right_sidebar">
-                    <!-- Widget Recherche -->
+
+                    <!-- Recherche -->
                     <aside class="single_sidebar_widget search_widget">
                         <form action="#">
                             <div class="form-group">
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" placeholder='Search Keyword'
-                                        onfocus="this.placeholder = ''" onblur="this.placeholder = 'Search Keyword'">
+                                    <input type="text" class="form-control" placeholder="Rechercher...">
                                     <div class="input-group-append">
-                                        <button class="btn" type="button"><i class="ti-search"></i></button>
+                                        <button class="btn" type="submit"><i class="ti-search"></i></button>
                                     </div>
                                 </div>
                             </div>
-                            <button class="button rounded-0 primary-bg text-white w-100 btn_1" type="submit">Search</button>
+                            <button class="button rounded-0 primary-bg text-white w-100 btn_1" type="submit">Rechercher</button>
                         </form>
                     </aside>
 
-                    <!-- Widget Catégories -->
+                    <!-- Catégories -->
                     <aside class="single_sidebar_widget post_category_widget">
                         <h4 class="widget_title">Catégories</h4>
                         <ul class="list cat-list">
                             {% for categorie in blog_categories %}
                                 <li>
-                                    <a href="{% url 'blog' %}?categorie={{ categorie.id }}" class="d-flex">
+                                    <a href="?categorie={{ categorie.id }}" class="d-flex justify-content-between">
                                         <p>{{ categorie.nom }}</p>
                                         <p>({{ categorie.article_set.count }})</p>
                                     </a>
                                 </li>
                             {% empty %}
-                                <li>Aucune catégorie</li>
+                                <li>Aucune catégorie disponible</li>
                             {% endfor %}
                         </ul>
                     </aside>
 
-                    {# Vous pouvez ajouter ici d'autres widgets selon vos besoins #}
                 </div>
             </div>
         </div>
     </div>
 </section>
-<!-- Blog Area end -->
-
 {% endblock %}

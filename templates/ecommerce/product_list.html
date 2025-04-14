@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% load static %}
 {% block title %}LeDjassa - Liste des articles d'occasion{% endblock %}
 
@@ -26,7 +25,7 @@
             <div class="col-md-4">
                 <div class="product_sidebar">
                     <div class="single_sedebar">
-                        <form action="#" method="get">
+                        <form action="{% url 'product_list' %}" method="get">
                             <input type="text" name="keyword" placeholder="Rechercher un article">
                             <i class="ti-search"></i>
                         </form>
@@ -49,9 +48,9 @@
                             </div>
                         </div>
                     </div>
-                    {# Vous pouvez ajouter d'autres filtres ici #}
                 </div>
             </div>
+
             <!-- Zone d'affichage des produits -->
             <div class="col-md-8">
                 <div class="product_list">
@@ -62,10 +61,10 @@
                                 <div class="single_product_item text-center">
                                     {% if produit.image %}
                                         <img src="{{ produit.image.url }}" alt="{{ produit.titre }}" class="img-fluid"
-                                             style="width:100%; max-width:250px; height:250px; object-fit:cover; margin:auto; display:block;">
+                                             style="width:100%; max-width:250px; height:250px; object-fit:cover;">
                                     {% else %}
                                         <img src="{% static 'img/placeholder.png' %}" alt="Sans image" class="img-fluid"
-                                             style="width:100%; max-width:250px; height:250px; object-fit:cover; margin:auto; display:block;">
+                                             style="width:100%; max-width:250px; height:250px; object-fit:cover;">
                                     {% endif %}
                                     <h3 class="mt-3">
                                         <a href="{% url 'single_product' produit.id %}">{{ produit.titre }}</a>
@@ -80,10 +79,35 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="load_more_btn text-center">
-                        <a href="#" class="btn_3">Charger plus</a>
+
+                    <!-- Pagination -->
+                    {% if paginated %}
+                    <div class="text-center mt-4">
+                        <nav>
+                            <ul class="pagination justify-content-center">
+                                {% if produits.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ produits.previous_page_number }}{% if request.GET.categorie %}&categorie={{ request.GET.categorie }}{% endif %}">«</a>
+                                    </li>
+                                {% endif %}
+
+                                {% for page_num in produits.paginator.page_range %}
+                                    <li class="page-item {% if produits.number == page_num %}active{% endif %}">
+                                        <a class="page-link" href="?page={{ page_num }}{% if request.GET.categorie %}&categorie={{ request.GET.categorie }}{% endif %}">{{ page_num }}</a>
+                                    </li>
+                                {% endfor %}
+
+                                {% if produits.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ produits.next_page_number }}{% if request.GET.categorie %}&categorie={{ request.GET.categorie }}{% endif %}">»</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
                     </div>
-                    
+                    {% endif %}
+
+                    <!-- Bouton Ajouter article -->
                     {% if user.is_authenticated and user.profilutilisateur.role == 'vendeur' %}
                         <div class="text-center mt-4">
                             <a href="{% url 'ajouter_produit' %}" class="btn_3">Ajouter article</a>
