@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
 
-<!-- breadcrumb part start-->
+{% block title %}Créer un compte | LeDjassa{% endblock %}
+
+{% block content %}
+<!-- breadcrumb part start -->
 <section class="breadcrumb_part">
     <div class="container">
         <div class="row">
@@ -14,58 +16,74 @@
         </div>
     </div>
 </section>
-<!-- breadcrumb part end-->
+<!-- breadcrumb part end -->
 
-<!--================register_part Area =================-->
 <section class="login_part section_padding">
     <div class="container">
         <div class="row align-items-center">
+            <!-- Texte gauche -->
             <div class="col-lg-6 col-md-6">
                 <div class="login_part_text text-center">
                     <div class="login_part_text_iner">
                         <h2>Déjà un compte ?</h2>
-                        <p>Connectez-vous pour accéder à votre espace personnel et commencer à explorer ou vendre.</p>
+                        <p>Connectez-vous pour accéder à votre tableau de bord et interagir avec LeDjassa.</p>
                         <a href="{% url 'login' %}" class="btn_3">Se connecter</a>
                     </div>
                 </div>
             </div>
+
+            <!-- Formulaire inscription -->
             <div class="col-lg-6 col-md-6">
                 <div class="login_part_form">
                     <div class="login_part_form_iner">
                         <h3>Créer un compte</h3>
+
                         <form method="post" class="row contact_form" novalidate>
                             {% csrf_token %}
-                            {{ form.non_field_errors }}
+
+                            {% if form.non_field_errors %}
+                                <div class="col-md-12 form-group">
+                                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                                </div>
+                            {% endif %}
+
                             <div class="col-md-12 form-group p_star">
-                                {{ form.username.label_tag }}
-                                {{ form.username }}
+                                <label for="id_username"><i class="ti-user mr-2"></i>Nom d'utilisateur</label>
+                                <input type="text" name="username" id="id_username" class="form-control"
+                                       placeholder="Nom d'utilisateur" required>
                                 {{ form.username.errors }}
                             </div>
+
                             <div class="col-md-12 form-group p_star">
-                                {{ form.email.label_tag }}
-                                {{ form.email }}
+                                <label for="id_email"><i class="ti-email mr-2"></i>Adresse e-mail</label>
+                                <input type="email" name="email" id="id_email" class="form-control"
+                                       placeholder="exemple@ledjassa.com" required>
                                 {{ form.email.errors }}
                             </div>
+
                             <div class="col-md-12 form-group p_star">
-                                {{ form.password1.label_tag }}
-                                {{ form.password1 }}
+                                <label for="id_password1"><i class="ti-lock mr-2"></i>Mot de passe</label>
+                                <input type="password" name="password1" id="id_password1" class="form-control"
+                                       placeholder="Mot de passe sécurisé" required>
                                 {{ form.password1.errors }}
                             </div>
+
                             <div class="col-md-12 form-group p_star">
-                                {{ form.password2.label_tag }}
-                                {{ form.password2 }}
+                                <label for="id_password2"><i class="ti-lock mr-2"></i>Confirmer mot de passe</label>
+                                <input type="password" name="password2" id="id_password2" class="form-control"
+                                       placeholder="Confirmez le mot de passe" required>
                                 {{ form.password2.errors }}
                             </div>
-                            <div class="col-md-12 form-group">
-                                <button type="submit" class="btn_3">Créer mon compte</button>
+
+                            <div class="col-md-12 form-group text-center">
+                                <button type="submit" class="btn_3 w-100">Créer mon compte</button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-<!--================register_part end =================-->
-
 {% endblock %}

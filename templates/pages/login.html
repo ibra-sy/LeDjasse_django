@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
 
-<!-- breadcrumb part start-->
+{% block title %}Connexion | LeDjassa{% endblock %}
+
+{% block content %}
+<!-- breadcrumb part start -->
 <section class="breadcrumb_part">
     <div class="container">
         <div class="row">
@@ -14,57 +16,68 @@
         </div>
     </div>
 </section>
-<!-- breadcrumb part end-->
+<!-- breadcrumb part end -->
 
-<!--================login_part Area =================-->
-<section class="login_part section_padding ">
+<section class="login_part section_padding">
     <div class="container">
         <div class="row align-items-center">
+            <!-- Texte à gauche -->
             <div class="col-lg-6 col-md-6">
                 <div class="login_part_text text-center">
                     <div class="login_part_text_iner">
                         <h2>Nouvel utilisateur ?</h2>
-                        <p>Créez un compte pour pouvoir vendre ou interagir avec les articles d'occasion.</p>
+                        <p>Créez un compte gratuitement pour interagir ou publier sur LeDjassa.</p>
                         <a href="{% url 'register' %}" class="btn_3">Créer un compte</a>
                     </div>
                 </div>
             </div>
+
+            <!-- Formulaire à droite -->
             <div class="col-lg-6 col-md-6">
                 <div class="login_part_form">
                     <div class="login_part_form_iner">
-                        <h3>Bon retour ! <br> Connectez-vous</h3>
+                        <h3>Bon retour !<br> Connectez-vous à votre espace</h3>
+
                         <form method="post" class="row contact_form">
                             {% csrf_token %}
+
                             {% if form.non_field_errors %}
-                                <div class="col-md-12 form-group">
+                                <div class="col-12 mb-3">
                                     <div class="alert alert-danger">{{ form.non_field_errors }}</div>
                                 </div>
                             {% endif %}
+
                             <div class="col-md-12 form-group p_star">
-                                {{ form.username.label_tag }}
-                                {{ form.username }}
+                                <label for="id_username"><i class="ti-user mr-2"></i>Nom d'utilisateur</label>
+                                <input type="text" name="username" id="id_username" class="form-control"
+                                       placeholder="Votre nom d'utilisateur" required>
                                 {{ form.username.errors }}
                             </div>
+
                             <div class="col-md-12 form-group p_star">
-                                {{ form.password.label_tag }}
-                                {{ form.password }}
+                                <label for="id_password"><i class="ti-lock mr-2"></i>Mot de passe</label>
+                                <input type="password" name="password" id="id_password" class="form-control"
+                                       placeholder="Votre mot de passe" required>
                                 {{ form.password.errors }}
                             </div>
-                            <div class="col-md-12 form-group">
+
+                            <div class="col-md-12 form-group d-flex justify-content-between align-items-center">
                                 <div class="creat_account d-flex align-items-center">
-                                    <input type="checkbox" id="f-option" name="remember">
-                                    <label for="f-option">Se souvenir de moi</label>
+                                    <input type="checkbox" id="remember" name="remember">
+                                    <label for="remember" class="ml-2">Se souvenir de moi</label>
                                 </div>
-                                <button type="submit" class="btn_3">Connexion</button>
                                 <a class="lost_pass" href="#">Mot de passe oublié ?</a>
                             </div>
+
+                            <div class="col-md-12 form-group text-center">
+                                <button type="submit" class="btn_3 w-100">Connexion</button>
+                            </div>
                         </form>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-<!--================login_part end =================-->
-
 {% endblock %}

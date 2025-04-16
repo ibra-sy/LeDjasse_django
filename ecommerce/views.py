@@ -46,7 +46,7 @@ def ajouter_produit(request):
         return redirect('product_list')
 
     if request.method == 'POST':
-        form = ProduitForm(request.POST, request.FILES, user=request.user)
+        form = ProduitForm(request.POST or None, request.FILES or None, user=request.user)
         if form.is_valid():
             produit = form.save(commit=False)
             produit.vendeur = request.user
@@ -189,14 +189,26 @@ def confirmer_vente(request):
     produit_id = request.GET.get('produit_id')
     produit = get_object_or_404(Produit, id=produit_id)
 
-    # Vérifie que seul le vendeur peut confirmer
     if produit.vendeur != request.user:
         messages.error(request, "Accès interdit.")
         return redirect('product_list')
 
     if request.method == 'POST':
+        # Créer un enregistrement d'achat
+        Achat.objects.create(
+            utilisateur=User.objects.filter(email=request.GET.get('email_client')).first(),
+            produit=produit,
+            email=request.GET.get('email_client'),
+            ville=request.GET.get('ville'),
+            commune=request.GET.get('commune'),
+            quartier=request.GET.get('quartier'),
+            rue=request.GET.get('rue'),
+        )
+
+        # Supprimer le produit (ou marquer comme vendu)
         produit.delete()
-        messages.success(request, "La vente a été confirmée. Le produit a été retiré.")
+
+        messages.success(request, "La vente a été confirmée.")
         return redirect('product_list')
 
     context = {

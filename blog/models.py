@@ -50,6 +50,7 @@ class Commentaire(models.Model):
     utilisateur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Utilisateur")
     contenu = models.TextField(verbose_name="Contenu")
     date = models.DateTimeField(auto_now_add=True, verbose_name="Date du commentaire")
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='reponses')
 
     class Meta:
         verbose_name = "Commentaire"

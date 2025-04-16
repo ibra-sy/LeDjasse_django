@@ -131,17 +131,14 @@ def create_user_profile(sender, instance, created, **kwargs):
         ProfilUtilisateur.objects.create(user=instance)
 
 class Achat(models.Model):
-    utilisateur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Acheteur")
-    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    utilisateur = models.ForeignKey(User, on_delete=models.CASCADE)
+    produit = models.ForeignKey(Produit, on_delete=models.SET_NULL, null=True)
+    date_achat = models.DateTimeField(auto_now_add=True)
     email = models.EmailField()
     ville = models.CharField(max_length=100)
     commune = models.CharField(max_length=100)
     quartier = models.CharField(max_length=100)
     rue = models.CharField(max_length=100)
-    date_achat = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-date_achat']
 
     def __str__(self):
-        return f"{self.utilisateur.username} a acheté {self.produit.titre}"
+        return f"{self.utilisateur.username} - {self.produit.titre}"

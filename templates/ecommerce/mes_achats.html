@@ -17,15 +17,26 @@
 <section class="section_padding">
   <div class="container">
     {% if achats %}
-      <ul class="list-group">
+      <div class="row">
         {% for achat in achats %}
-        <li class="list-group-item">
-          <strong>{{ achat.produit.titre }}</strong> — {{ achat.date_achat|date:"d M Y H:i" }}<br>
-          Livraison : {{ achat.rue }}, {{ achat.quartier }}, {{ achat.commune }}, {{ achat.ville }}<br>
-          <span class="text-muted">Email : {{ achat.email }}</span>
-        </li>
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            {% if achat.produit.image %}
+              <img src="{{ achat.produit.image.url }}" class="card-img-top" alt="{{ achat.produit.titre }}" style="height:250px; object-fit:cover;">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ achat.produit.titre }}</h5>
+              <p class="card-text">Prix : <strong>{{ achat.produit.prix }} FCFA</strong></p>
+              <p class="card-text text-muted">
+                Adresse : {{ achat.rue }}, {{ achat.quartier }}, {{ achat.commune }}, {{ achat.ville }}<br>
+                Email : {{ achat.email }}<br>
+                Commandé le : {{ achat.date_achat|date:"d M Y à H:i" }}
+              </p>
+            </div>
+          </div>
+        </div>
         {% endfor %}
-      </ul>
+      </div>
     {% else %}
       <p>Vous n'avez encore effectué aucun achat.</p>
     {% endif %}

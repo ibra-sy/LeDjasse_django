@@ -33,15 +33,41 @@
 
                 <form method="post">
                     {% csrf_token %}
-                    <div class="form-group">
+                    <div class="form-group text-left">
                         <label for="email">Votre adresse e-mail :</label>
                         <input type="email" name="email" id="email" class="form-control" value="{{ request.user.email }}" required>
                     </div>
-                    <button type="submit" class="btn_3 mt-3">Payer et devenir vendeur</button>
+
+                    <div class="form-group text-left">
+                        <label>Choisissez un mode de paiement :</label>
+                        <div class="d-flex justify-content-around my-3">
+                            <label>
+                                <input type="radio" name="moyen_paiement" value="orange" required>
+                                <img src="{% static 'img/paiement/orange.png' %}" alt="Orange Money" style="height:50px;">
+                            </label>
+                            <label>
+                                <input type="radio" name="moyen_paiement" value="wave">
+                                <img src="{% static 'img/paiement/wave.png' %}" alt="Wave" style="height:50px;">
+                            </label>
+                            <label>
+                                <input type="radio" name="moyen_paiement" value="mtn">
+                                <img src="{% static 'img/paiement/mtn.png' %}" alt="MTN MoMo" style="height:50px;">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group text-left">
+                        <label for="numero">Numéro Mobile Money :</label>
+                        <input type="tel" name="numero" id="numero" class="form-control" placeholder="ex: 0700000000" required>
+                    </div>
+
+                    <div class="form-group text-center">
+                        <button type="submit" class="btn_3 mt-3">Simuler le Paiement</button>
+                    </div>
                 </form>
 
                 {% if message %}
-                    <p class="mt-4 text-success">{{ message }}</p>
+                    <p class="mt-4 text-success font-weight-bold">{{ message }}</p>
                 {% endif %}
             </div>
         </div>

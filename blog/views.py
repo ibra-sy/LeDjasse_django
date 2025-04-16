@@ -32,16 +32,43 @@ def blog_list(request):
         'paginated': paginated
     })
 
+@login_required
 def single_blog(request, pk):
     article = get_object_or_404(Article, pk=pk)
+    commentaires = article.commentaires.filter(parent__isnull=True)
     previous_article = Article.objects.filter(id__lt=article.id).order_by('-id').first()
     next_article = Article.objects.filter(id__gt=article.id).order_by('id').first()
     recent_posts = Article.objects.exclude(id=pk).order_by('-date_publication')[:3]
 
-    if request.method == 'POST' and request.user.is_authenticated:
+    if request.method == 'POST':
         contenu = request.POST.get('contenu')
-        if contenu:
-            Commentaire.objects.create(article=article, utilisateur=request.user, contenu=contenu)
+        parent_id = request.POST.get('parent_id')
+        modifier_id = request.POST.get('modifier_id')
+        supprimer_id = request.POST.get('supprimer_id')
+
+        # ✅ Suppression
+        if supprimer_id and request.user.is_authenticated:
+            commentaire = get_object_or_404(Commentaire, id=supprimer_id, utilisateur=request.user)
+            commentaire.delete()
+            return redirect('single_blog', pk=pk)
+
+        # ✅ Modification
+        if modifier_id and request.user.is_authenticated:
+            commentaire = get_object_or_404(Commentaire, id=modifier_id, utilisateur=request.user)
+            if contenu:  # ✅ On vérifie que le contenu n'est pas vide
+                commentaire.contenu = contenu
+                commentaire.save()
+                return redirect('single_blog', pk=pk)
+            else:
+                messages.error(request, "Le contenu ne peut pas être vide.")
+
+        # ✅ Nouveau commentaire ou réponse
+        if contenu and request.user.is_authenticated:
+            commentaire = Commentaire(article=article, utilisateur=request.user, contenu=contenu)
+            if parent_id:
+                parent = get_object_or_404(Commentaire, id=parent_id)
+                commentaire.parent = parent
+            commentaire.save()
             return redirect('single_blog', pk=pk)
 
     return render(request, 'blog/single-blog.html', {
@@ -49,6 +76,7 @@ def single_blog(request, pk):
         'previous_article': previous_article,
         'next_article': next_article,
         'recent_posts': recent_posts,
+        'commentaires': commentaires,
     })
 
 
@@ -93,11 +121,18 @@ def modifier_article(request, article_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Article modifié avec succès.")
-            return redirect('single_blog', pk=article.pk)  # ✅ Redirection vers l’article
+            return redirect('single_blog', pk=article.pk)
     else:
-        form = ArticleForm(instance=article)
+        initial = {
+            'categorie': article.categorie.nom if article.categorie else '',
+            'tags': ", ".join(tag.nom for tag in article.tags.all()),
+        }
+        form = ArticleForm(instance=article, initial=initial)
 
-    return render(request, 'blog/modifier_article.html', {'form': form, 'article': article})
+    return render(request, 'blog/modifier_article.html', {
+        'form': form,
+        'article': article,
+    })
 
 @login_required
 def supprimer_article(request, article_id):

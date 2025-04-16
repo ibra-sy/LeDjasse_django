@@ -53,10 +53,10 @@
                   <div class="col-md-6 mb-4">
                     <label for="id_categorie">Catégorie :</label>
                     <input list="categorie-options" name="categorie" id="id_categorie" class="form-control"
-                    value="{{ form.data.categorie|default_if_none:'' }}">
+                           value="{{ form.data.categorie|default_if_none:'' }}">
                     <datalist id="categorie-options">
-                      {% for categorie in form.fields.categorie.queryset %}
-                        <option value="{{ categorie.pk }}">{{ categorie.nom }}</option>
+                      {% for categorie in form.existing_categories %}
+                        <option value="{{ categorie.nom }}">{{ categorie.nom }}</option>
                       {% endfor %}
                     </datalist>
                   </div>

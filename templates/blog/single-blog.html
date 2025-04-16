@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}{{ article.titre }} | pillloMart{% endblock %}
+{% block title %}{{ article.titre }} | LeDjassa{% endblock %}
 
 {% block content %}
-<!-- Breadcrumb start -->
 <section class="breadcrumb_part">
   <div class="container">
     <div class="row">
@@ -15,19 +14,15 @@
     </div>
   </div>
 </section>
-<!-- Breadcrumb end -->
 
 <section class="blog_area single-post-area section_padding">
   <div class="container">
     <div class="row">
-      <!-- CONTENU PRINCIPAL -->
       <div class="col-lg-8 posts-list">
         <div class="single-post">
           <div class="feature-img">
             {% if article.image %}
               <img class="img-fluid" src="{{ article.image.url }}" alt="{{ article.titre }}">
-            {% else %}
-              <img class="img-fluid" src="{% static 'img/blog/default.jpg' %}" alt="Image défaut">
             {% endif %}
           </div>
           <div class="blog_details">
@@ -37,10 +32,10 @@
               <li><i class="far fa-comments"></i> {{ article.commentaires.count }} Commentaire(s)</li>
             </ul>
             {% if user == article.auteur %}
-            <div class="text-right mb-3">
-               <a href="{% url 'modifier_article' article.id %}" class="btn btn-outline-warning btn-sm">Modifier</a>
-               <a href="{% url 'supprimer_article' article.id %}" class="btn btn-outline-danger btn-sm">Supprimer</a>
-            </div>
+              <div class="text-right mb-3">
+                <a href="{% url 'modifier_article' article.id %}" class="btn btn-outline-warning btn-sm">Modifier</a>
+                <a href="{% url 'supprimer_article' article.id %}" class="btn btn-outline-danger btn-sm">Supprimer</a>
+              </div>
             {% endif %}
             <div class="excert">
               {{ article.contenu|safe }}
@@ -48,129 +43,111 @@
           </div>
         </div>
 
-        <!-- NAVIGATION ENTRE ARTICLES -->
-        <div class="navigation-area">
-          <div class="row">
-            {% if previous_article %}
-            <div class="col-lg-6 nav-left d-flex align-items-center">
-              <div class="thumb">
-                <a href="{% url 'single_blog' previous_article.pk %}">
-                  {% if previous_article.image %}
-                    <img class="img-fluid" src="{{ previous_article.image.url }}" alt="">
-                  {% endif %}
-                </a>
-              </div>
-              <div class="details">
-                <p>Article précédent</p>
-                <a href="{% url 'single_blog' previous_article.pk %}">
-                  <h4>{{ previous_article.titre }}</h4>
-                </a>
-              </div>
-            </div>
-            {% endif %}
-
-            {% if next_article %}
-            <div class="col-lg-6 nav-right d-flex align-items-center justify-content-end">
-              <div class="details">
-                <p>Article suivant</p>
-                <a href="{% url 'single_blog' next_article.pk %}">
-                  <h4>{{ next_article.titre }}</h4>
-                </a>
-              </div>
-              <div class="thumb">
-                <a href="{% url 'single_blog' next_article.pk %}">
-                  {% if next_article.image %}
-                    <img class="img-fluid" src="{{ next_article.image.url }}" alt="">
-                  {% endif %}
-                </a>
-              </div>
-            </div>
-            {% endif %}
-          </div>
-        </div>
-
-        <!-- AUTEUR -->
-        <div class="blog-author">
-          <div class="media align-items-center">
-            <img src="{% static 'img/blog/author.png' %}" alt="">
-            <div class="media-body">
-              <h4>{{ article.auteur.username }}</h4>
-              <p>Biographie ou description rapide ici si disponible...</p>
-            </div>
-          </div>
-        </div>
-
         <!-- COMMENTAIRES -->
-        <div class="comments-area">
+        <div class="comments-area mt-5">
           <h4>{{ article.commentaires.count }} Commentaire(s)</h4>
-          {% for commentaire in article.commentaires.all %}
-          <div class="comment-list">
-            <div class="single-comment d-flex">
-              <div class="thumb">
-                <img src="{% static 'img/comment/default.png' %}" alt="">
-              </div>
-              <div class="desc">
-                <p class="comment">{{ commentaire.contenu }}</p>
-                <div class="d-flex justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <h5><a href="#">{{ commentaire.utilisateur.username }}</a></h5>
-                    <p class="date">{{ commentaire.date|date:"d M Y à H:i" }}</p>
-                  </div>
+          {% for commentaire in commentaires %}
+            <div class="comment-list">
+              <div class="single-comment d-flex">
+                <div class="thumb">
+                  <img src="{% static 'img/comment/default.png' %}" alt="">
+                </div>
+                <div class="desc w-100">
+                  {% if request.user == commentaire.utilisateur and request.GET.modif == commentaire.id|stringformat:"s" %}
+                    <!-- FORMULAIRE MODIFICATION -->
+                    <form method="post" class="mb-3">
+                      {% csrf_token %}
+                      <input type="hidden" name="modifier_id" value="{{ commentaire.id }}">
+                      <textarea name="contenu" class="form-control mb-2" required>{{ commentaire.contenu }}</textarea>
+                      <button type="submit" class="btn btn-sm btn-success">Valider</button>
+                      <a href="{% url 'single_blog' article.id %}" class="btn btn-sm btn-secondary">Annuler</a>
+                    </form>
+                  {% else %}
+                    <!-- AFFICHAGE CLASSIQUE -->
+                    <p class="comment">{{ commentaire.contenu }}</p>
+                    <div class="d-flex justify-content-between">
+                      <div class="d-flex align-items-center">
+                        <h5 class="mb-0">{{ commentaire.utilisateur.username }}</h5>
+                        <p class="date ml-2">{{ commentaire.date|date:"d M Y à H:i" }}</p>
+                      </div>
+                      {% if user == commentaire.utilisateur %}
+                        <div>
+                          <a href="?modif={{ commentaire.id }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                          <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="supprimer_id" value="{{ commentaire.id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Confirmer la suppression ?');">Supprimer</button>
+                          </form>
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+
+                  <!-- RÉPONSES -->
+                  {% for reponse in commentaire.reponses.all %}
+                    <div class="reply ml-4 mt-3 border-left pl-3">
+                      <strong>{{ reponse.utilisateur.username }}</strong> – {{ reponse.date|date:"d M Y à H:i" }}<br>
+                      {{ reponse.contenu }}
+                    </div>
+                  {% endfor %}
+
+                  <!-- FORMULAIRE RÉPONSE -->
+                  {% if user.is_authenticated %}
+                    <a href="#" class="reply-link text-primary mt-2 d-inline-block"
+                       onclick="event.preventDefault(); document.getElementById('reply-form-{{ commentaire.id }}').style.display='block';">
+                      Répondre
+                    </a>
+                    <form id="reply-form-{{ commentaire.id }}" method="post" style="display:none;" class="mt-2">
+                      {% csrf_token %}
+                      <textarea name="contenu" class="form-control mb-2" required placeholder="Votre réponse..."></textarea>
+                      <input type="hidden" name="parent_id" value="{{ commentaire.id }}">
+                      <button type="submit" class="btn btn-sm btn-outline-success">Envoyer</button>
+                    </form>
+                  {% endif %}
                 </div>
               </div>
             </div>
-          </div>
           {% endfor %}
         </div>
 
-        <!-- FORMULAIRE DE COMMENTAIRE -->
+        <!-- NOUVEAU COMMENTAIRE -->
         {% if user.is_authenticated %}
-        <div class="comment-form">
+        <div class="comment-form mt-5">
           <h4>Laisser un commentaire</h4>
           <form method="post" class="form-contact comment_form">
             {% csrf_token %}
-            <div class="form-group">
-              <textarea class="form-control w-100" name="contenu" cols="30" rows="9" placeholder="Votre commentaire..."></textarea>
-            </div>
-            <div class="form-group">
-              <button type="submit" class="button-contactForm btn_3">Envoyer</button>
-            </div>
+            <textarea class="form-control w-100" name="contenu" rows="6" required placeholder="Votre commentaire..."></textarea>
+            <button type="submit" class="btn_3 mt-3">Envoyer</button>
           </form>
         </div>
         {% else %}
-        <p>Vous devez être <a href="{% url 'login' %}">connecté</a> pour commenter.</p>
+          <p class="mt-4">Vous devez être <a href="{% url 'login' %}">connecté</a> pour commenter.</p>
         {% endif %}
       </div>
 
-      <!-- SIDEBAR À DROITE -->
+      <!-- SIDEBAR -->
       <div class="col-lg-4">
         <div class="blog_right_sidebar">
-          <!-- ARTICLES RÉCENTS -->
           <aside class="single_sidebar_widget popular_post_widget">
             <h3 class="widget_title">Articles récents</h3>
             {% for recent in recent_posts %}
-            <div class="media post_item">
-              {% if recent.image %}
-                <img src="{{ recent.image.url }}" alt="{{ recent.titre }}" style="width:60px; height:60px; object-fit:cover;">
-              {% endif %}
-              <div class="media-body">
-                <a href="{% url 'single_blog' recent.pk %}">
-                  <h3 style="font-size: 16px;">{{ recent.titre }}</h3>
-                </a>
-                <p>{{ recent.date_publication|date:"d M Y" }}</p>
+              <div class="media post_item">
+                {% if recent.image %}
+                  <img src="{{ recent.image.url }}" alt="{{ recent.titre }}" style="width:60px; height:60px; object-fit:cover;">
+                {% endif %}
+                <div class="media-body">
+                  <a href="{% url 'single_blog' recent.pk %}"><h3 style="font-size: 16px;">{{ recent.titre }}</h3></a>
+                  <p>{{ recent.date_publication|date:"d M Y" }}</p>
+                </div>
               </div>
-            </div>
             {% endfor %}
           </aside>
 
-          <!-- TAG CLOUD -->
           <aside class="single_sidebar_widget tag_cloud_widget">
             <h4 class="widget_title">Tags</h4>
             <ul class="list">
               {% for tag in article.tags.all %}
-              {% if tag.nom %}
                 <li><a href="{% url 'blog_by_tag' tag.nom %}">{{ tag.nom }}</a></li>
-              {% endif %}
               {% endfor %}
             </ul>
           </aside>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Categorie, Produit, Commande, Conversation, Message, ProfilUtilisateur
+from .models import Categorie, Produit, Commande, Conversation, Message, ProfilUtilisateur, Achat
 from django.contrib.auth import get_user_model
 
 @admin.register(Categorie)
@@ -43,3 +43,11 @@ class MessageAdmin(admin.ModelAdmin):
 class ProfilUtilisateurAdmin(admin.ModelAdmin):
     list_display = ('user', 'role')
     list_filter = ('role',)
+
+
+@admin.register(Achat)
+class AchatAdmin(admin.ModelAdmin):
+    list_display = ('utilisateur', 'produit', 'email', 'date_achat', 'ville', 'commune')
+    list_filter = ('ville', 'commune', 'date_achat')
+    search_fields = ('utilisateur__username', 'produit__titre', 'email')
+    ordering = ('-date_achat',)

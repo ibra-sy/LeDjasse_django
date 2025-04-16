@@ -26,11 +26,13 @@
                 <div class="product_img_slide owl-carousel">
                     {% if produit.image %}
                         <div class="single_product_img">
-                            <img src="{{ produit.image.url }}" alt="{{ produit.titre }}" class="img-fluid">
+                            <img src="{{ produit.image.url }}" alt="{{ produit.titre }}" class="img-fluid"
+                                style="width: 100%; max-width: 600px; height: 400px; object-fit: cover; display: block; margin: auto;">
                         </div>
                     {% else %}
                         <div class="single_product_img">
-                            <img src="{% static 'img/placeholder.png' %}" alt="Pas d'image" class="img-fluid">
+                            <img src="{% static 'img/placeholder.png' %}" alt="Pas d'image" class="img-fluid"
+                                style="width: 100%; max-width: 600px; height: 400px; object-fit: cover; display: block; margin: auto;">
                         </div>
                     {% endif %}
                     {# Vous pouvez ajouter d'autres images ici si disponibles #}
@@ -40,20 +42,27 @@
             <div class="col-lg-8">
                 <div class="single_product_text text-center">
                     <h3>{{ produit.titre }}</h3>
+                    
+                    <p class="text-muted mb-1">Proposé par : <strong>{{ produit.vendeur.username }}</strong></p>
+                
                     <p>{{ produit.description }}</p>
                     <div class="card_area">
                         <div class="price_area">
                             <p><b>{{ produit.prix }} Franc CFA</b></p>
                         </div>
                         <div class="add_to_cart">
-                            <a href="{% url 'confirmer_achat' produit.id %}" class="btn_3">Acheter</a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'confirmer_achat' produit.id %}" class="btn_3">Acheter</a>
+                            {% else %}
+                                <a href="{% url 'login' %}?next={{ request.path }}" class="btn_3">Se connecter pour acheter</a>
+                            {% endif %}
                         </div>
                         <!-- Nouveau bouton Message -->
                         <div class="message_button" style="margin-top: 15px;">
                             {% if user.is_authenticated and user != produit.vendeur %}
                             <a href="{% url 'demarrer_conversation' produit.vendeur.id %}" class="btn_3">Message au vendeur</a>
                             {% elif not user.is_authenticated %}
-                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn_3">Se connecter pour contacter</a>
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn_3">Se connecter pour envoyer message</a>
                             {% endif %}
                         </div>
                     </div>
